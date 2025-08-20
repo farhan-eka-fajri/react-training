@@ -1,13 +1,15 @@
-import logo from "./logo.svg";
+// import logo from "./logo.svg";
 import "./App.css";
 import { useNavigate } from "react-router-dom";
+import { LogoReact } from "./assets/icon";
 
 function App() {
   const navigate = useNavigate();
   return (
     <div className="App">
       <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
+        {/* <img src={logo} className="App-logo" alt="logo" /> */}
+        <LogoReact style={{animation: 'spin 5s linear infinite', width:'150px'}} />
         <button
           onClick={() => navigate("/longitude")}
           style={{
