@@ -1,8 +1,9 @@
 import { APIProvider, Map, Marker } from "@vis.gl/react-google-maps";
 import { debounce } from "lodash";
 import { useEffect, useMemo, useState } from "react";
+import { LogoMarker } from "../assets/icon";
 export default function MapGoogleLongitude() {
-  const [pos, setPos] = useState(); // Jakarta default
+  const [pos, setPos] = useState({ lat: -6.2, lng: 106.816666 }); // Jakarta default
   const [valInput, setValInput] = useState("");
   const [places, setPlaces] = useState();
   const apiKey = "";
@@ -21,43 +22,63 @@ export default function MapGoogleLongitude() {
     });
   }, []);
 
-  fetch(url)
-    .then((response) => response.json())
-    .then((data) => {
-      if (data.status === "OK") {
-        const results = data.results;
-        if (results.length > 0) {
-          const formattedAddress = results[0].formatted_address;
-          setPlaces(formattedAddress);
-          console.log("Alamat:", formattedAddress);
-        } else {
-          console.log("Tidak ada hasil alamat");
-        }
-      } else {
-        console.error("Geocoding gagal:", data.status);
-      }
-    })
-    .catch((error) => console.error("Error:", error));
+  useEffect(() => {
+    setTimeout(() => {
+      fetch(url)
+        .then((response) => response.json())
+        .then((data) => {
+          if (data.status === "OK") {
+            const results = data.results;
+            if (results.length > 0) {
+              const formattedAddress = results[0].formatted_address;
+              setPlaces({address : formattedAddress, kordinat : results[0].geometry.location});
+              // console.log("Alamat:", formattedAddress);
+            } else {
+              console.log("Tidak ada hasil alamat");
+            }
+          } else {
+            console.error("Geocoding gagal:", data.status);
+          }
+        })
+        .catch((error) => console.error("Error:", error));
+    }, 500);
+  }, [url]);
 
-  if (!!valInput)
+  if (!!valInput) {
+    const handleClick = () => {
+      setValInput('')
+      setPos(places?.kordinat)
+    };
     return (
       <>
-          <div style={{ padding: "10px", textAlign: "center" }}>
-            <input
-              style={{
-                border: "2px solid grey",
-                borderRadius: "10px",
-                fontSize: "24px",
-                color: "grey",
-                padding: "5px",
-              }}
-              // onChange={(e) => setValInput(e.target.value)}
-              onChange={(e) => debouncedSetValInput(e.target.value)}
-            />
-          </div>
-          {places}
+        <div style={{ padding: "10px", textAlign: "center" }}>
+          <input
+            style={{
+              border: "2px solid grey",
+              borderRadius: "10px",
+              fontSize: "24px",
+              color: "grey",
+              padding: "5px",
+            }}
+            // onChange={(e) => setValInput(e.target.value)}
+            onChange={(e) => debouncedSetValInput(e.target.value)}
+          />
+        </div>
+        <div
+          style={{
+            padding: "10px",
+            border: "1px solid black",
+            background: "#d3d8e5",
+          }}
+        >
+          <LogoMarker style={{ width: "30px", height: "30px" }} /> {places?.address}
+          <button style={{ color: "blue" }} onClick={() => handleClick()}>
+            Ambil Koordinat{" "}
+          </button>
+        </div>
       </>
     );
+  }
 
   return (
     <>
@@ -76,7 +97,7 @@ export default function MapGoogleLongitude() {
       <APIProvider apiKey={apiKey}>
         <Map
           style={{ width: "100vw", height: "100vh" }}
-          defaultCenter={{ lat: -6.2, lng: 106.816666 }}
+          defaultCenter={pos}
           defaultZoom={12}
           gestureHandling={"greedy"}
           disableDefaultUI={true}
