@@ -1,7 +1,59 @@
-import { APIProvider, Map, Marker } from "@vis.gl/react-google-maps";
+import { APIProvider, Map, Marker, useMapsLibrary } from "@vis.gl/react-google-maps";
 import { debounce } from "lodash";
 import { useEffect, useMemo, useState } from "react";
 import { LogoMarker } from "../assets/icon";
+
+function AutocompleteInput() {
+  const placesLib = useMapsLibrary("places"); // ambil library "places"
+  const [service, setService] = useState(null);
+  const [query, setQuery] = useState("");
+  const [results, setResults] = useState([]);
+
+  // bikin instance AutocompleteService setelah placesLib ready
+  useEffect(() => {
+    if (!placesLib) return;
+    setService(new placesLib.AutocompleteService());
+  }, [placesLib]);
+
+  const handleChange = (e) => {
+    const value = e.target.value;
+    setQuery(value);
+
+    if (value && service) {
+      service.getPlacePredictions({ input: value }, (predictions, status) => {
+        if (
+          status === window.google.maps.places.PlacesServiceStatus.OK &&
+          predictions
+        ) {
+          setResults(predictions);
+        } else {
+          setResults([]);
+        }
+      });
+    } else {
+      setResults([]);
+    }
+  };
+
+  return (
+    <div>
+      <input
+        type="text"
+        value={query}
+        onChange={handleChange}
+        placeholder="Cari alamat..."
+        className="border p-2 rounded w-96"
+      />
+
+      <pre className="bg-gray-100 p-2 mt-2 rounded text-sm">
+        {JSON.stringify(results, null, 2)}
+      </pre>
+    </div>
+  );
+}
+
+
+
 export default function MapGoogleLongitude() {
   const [pos, setPos] = useState({ lat: -6.2, lng: 106.816666 }); // Jakarta default
   const [valInput, setValInput] = useState("");
@@ -11,6 +63,7 @@ export default function MapGoogleLongitude() {
     valInput
   )}&key=${apiKey}`;
 
+  
   const debouncedSetValInput = useMemo(
     () => debounce((value) => setValInput(value), 500),
     []
@@ -95,7 +148,7 @@ export default function MapGoogleLongitude() {
         />
       </div>
       <APIProvider apiKey={apiKey}>
-        <Map
+        {/* <Map
           style={{ width: "100vw", height: "100vh" }}
           defaultCenter={pos}
           defaultZoom={12}
@@ -107,8 +160,16 @@ export default function MapGoogleLongitude() {
             setPos({ lat, lng });
           }}
         />
-        <Marker position={pos} />
+        <Marker position={pos} /> */}
+
       </APIProvider>
+
+       <APIProvider apiKey={apiKey} libraries={["places"]}>
+      <div className="p-6">
+        <h1 className="text-xl font-bold mb-4">Google Places Autocomplete</h1>
+        <AutocompleteInput />
+      </div>
+    </APIProvider>
     </>
   );
 }
