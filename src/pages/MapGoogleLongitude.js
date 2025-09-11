@@ -1,9 +1,14 @@
-import { APIProvider, Map, Marker, useMapsLibrary } from "@vis.gl/react-google-maps";
+import {
+  APIProvider,
+  Map,
+  Marker,
+  useMapsLibrary,
+} from "@vis.gl/react-google-maps";
 import { debounce } from "lodash";
 import { useEffect, useMemo, useState } from "react";
 import { LogoMarker } from "../assets/icon";
 
-function AutocompleteInput() {
+function AutocompleteInput({ setValInput }) {
   const placesLib = useMapsLibrary("places"); // ambil library "places"
   const [service, setService] = useState(null);
   const [query, setQuery] = useState("");
@@ -45,14 +50,33 @@ function AutocompleteInput() {
         className="border p-2 rounded w-96"
       />
 
-      <pre className="bg-gray-100 p-2 mt-2 rounded text-sm">
+      {/* <pre className="bg-gray-100 p-2 mt-2 rounded text-sm">
         {JSON.stringify(results, null, 2)}
-      </pre>
+      </pre> */}
+      {results?.map((d, i) => {
+        return (
+          <div
+          key={i}
+            style={{
+              padding: "10px",
+              border: "1px solid black",
+              background: "#d3d8e5",
+            }}
+          >
+            <LogoMarker style={{ width: "30px", height: "30px" }} />{" "}
+            {d?.description}
+            <button
+              style={{ color: "blue" }}
+              onClick={() => setValInput(d.description)}
+            >
+              Ambil Koordinat{" "}
+            </button>
+          </div>
+        );
+      })}
     </div>
   );
 }
-
-
 
 export default function MapGoogleLongitude() {
   const [pos, setPos] = useState({ lat: -6.2, lng: 106.816666 }); // Jakarta default
@@ -62,12 +86,6 @@ export default function MapGoogleLongitude() {
   const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(
     valInput
   )}&key=${apiKey}`;
-
-  
-  const debouncedSetValInput = useMemo(
-    () => debounce((value) => setValInput(value), 500),
-    []
-  );
 
   useEffect(() => {
     window.navigator.geolocation.getCurrentPosition((e) => {
@@ -84,8 +102,10 @@ export default function MapGoogleLongitude() {
             const results = data.results;
             if (results.length > 0) {
               const formattedAddress = results[0].formatted_address;
-              setPlaces({address : formattedAddress, kordinat : results[0].geometry.location});
-              // console.log("Alamat:", formattedAddress);
+              setPlaces({
+                address: formattedAddress,
+                kordinat: results[0].geometry.location,
+              });
             } else {
               console.log("Tidak ada hasil alamat");
             }
@@ -97,60 +117,21 @@ export default function MapGoogleLongitude() {
     }, 500);
   }, [url]);
 
-  if (!!valInput) {
-    const handleClick = () => {
-      setValInput('')
-      setPos(places?.kordinat)
-    };
-    return (
-      <>
-        <div style={{ padding: "10px", textAlign: "center" }}>
-          <input
-            style={{
-              border: "2px solid grey",
-              borderRadius: "10px",
-              fontSize: "24px",
-              color: "grey",
-              padding: "5px",
-            }}
-            // onChange={(e) => setValInput(e.target.value)}
-            onChange={(e) => debouncedSetValInput(e.target.value)}
-          />
-        </div>
-        <div
-          style={{
-            padding: "10px",
-            border: "1px solid black",
-            background: "#d3d8e5",
-          }}
-        >
-          <LogoMarker style={{ width: "30px", height: "30px" }} /> {places?.address}
-          <button style={{ color: "blue" }} onClick={() => handleClick()}>
-            Ambil Koordinat{" "}
-          </button>
-        </div>
-      </>
-    );
-  }
+  //buat update titik koordinatnya setelah di klik
+  useEffect(() => {
+    if (!places) return;
+    setPos(places?.kordinat);
+  }, [places]);
 
   return (
     <>
-      <div style={{ padding: "10px", textAlign: "center" }}>
-        <input
-          style={{
-            border: "2px solid grey",
-            borderRadius: "10px",
-            fontSize: "24px",
-            color: "grey",
-            padding: "5px",
-          }}
-          onChange={(e) => setValInput(e.target.value)}
-        />
-      </div>
       <APIProvider apiKey={apiKey}>
-        {/* <Map
+        <h1 className="text-xl font-bold mb-4">Google Places Autocomplete</h1>
+        <AutocompleteInput setValInput={setValInput} />
+        <Map
           style={{ width: "100vw", height: "100vh" }}
-          defaultCenter={pos}
+          defaultCenter={{ lat: -6.2, lng: 106.816666 }}
+          center={pos}
           defaultZoom={12}
           gestureHandling={"greedy"}
           disableDefaultUI={true}
@@ -160,16 +141,8 @@ export default function MapGoogleLongitude() {
             setPos({ lat, lng });
           }}
         />
-        <Marker position={pos} /> */}
-
+        <Marker position={pos} />
       </APIProvider>
-
-       <APIProvider apiKey={apiKey} libraries={["places"]}>
-      <div className="p-6">
-        <h1 className="text-xl font-bold mb-4">Google Places Autocomplete</h1>
-        <AutocompleteInput />
-      </div>
-    </APIProvider>
     </>
   );
 }
