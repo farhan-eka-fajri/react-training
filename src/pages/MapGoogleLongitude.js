@@ -81,7 +81,7 @@ function AutocompleteInput({ setValInput }) {
 export default function MapGoogleLongitude() {
   const [pos, setPos] = useState({ lat: -6.2, lng: 106.816666 }); // Jakarta default
   const [valInput, setValInput] = useState("");
-  const [places, setPlaces] = useState();
+  const [center, setCenter] = useState()
   const apiKey = "";
   const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(
     valInput
@@ -101,11 +101,9 @@ export default function MapGoogleLongitude() {
           if (data.status === "OK") {
             const results = data.results;
             if (results.length > 0) {
-              const formattedAddress = results[0].formatted_address;
-              setPlaces({
-                address: formattedAddress,
-                kordinat: results[0].geometry.location,
-              });
+              // const formattedAddress = results[0].formatted_address; 
+              setPos(results[0].geometry.location)
+              setCenter(results[0].geometry.location) 
             } else {
               console.log("Tidak ada hasil alamat");
             }
@@ -117,21 +115,19 @@ export default function MapGoogleLongitude() {
     }, 500);
   }, [url]);
 
-  //buat update titik koordinatnya setelah di klik
   useEffect(() => {
-    if (!places) return;
-    setPos(places?.kordinat);
-  }, [places]);
+    if (!!center) return setCenter('') 
+  },[center])
 
   return (
     <>
       <APIProvider apiKey={apiKey}>
         <h1 className="text-xl font-bold mb-4">Google Places Autocomplete</h1>
-        <AutocompleteInput setValInput={setValInput} />
+        <AutocompleteInput setValInput={setValInput}  />
         <Map
           style={{ width: "100vw", height: "100vh" }}
           defaultCenter={{ lat: -6.2, lng: 106.816666 }}
-          center={pos}
+          center={center ?? ''}
           defaultZoom={12}
           gestureHandling={"greedy"}
           disableDefaultUI={true}
