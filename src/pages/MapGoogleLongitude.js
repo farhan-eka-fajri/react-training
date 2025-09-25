@@ -82,7 +82,7 @@ export default function MapGoogleLongitude() {
   const [pos, setPos] = useState({ lat: -6.2, lng: 106.816666 }); // Jakarta default
   const [valInput, setValInput] = useState("");
   const [center, setCenter] = useState()
-  const apiKey = "";
+  const apiKey = process.env.REACT_APP_GOOGLE_MAPS_KEY;
   const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(
     valInput
   )}&key=${apiKey}`;
