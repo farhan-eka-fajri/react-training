@@ -24,6 +24,20 @@ function App() {
         >
           CLICK TO MAP
         </button>
+         <button
+          onClick={() => navigate("/page-logging")}
+          style={{
+            fontSize: "x-large",
+            borderRadius: "15px",
+            padding: 20,
+            cursor: "pointer",
+            backgroundColor: '#1a73e8',
+            color:'white',
+            fontWeight:700
+          }}
+        >
+          CLICK TO TEST PAGE LOGGING
+        </button>
         <p>
           Edit <code>src/App.js</code> and save to reload.
         </p>
