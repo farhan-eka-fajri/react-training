@@ -1,35 +1,26 @@
 
 const TextHighlighter = () => {
   // Fungsi yang dipanggil saat onclick pada tombol warna
-  const handleColorClick = (color) => {
-    // 1. Ambil objek seleksi dari window
-    const selection = window.getSelection();
+ const handleColorClick = (color) => {
+  const selection = window.getSelection();
+  
+  if (!selection || selection.rangeCount === 0 || selection.isCollapsed) return;
 
-    // 2. Validasi: Pastikan ada teks yang diblok dan seleksi tidak kosong
-    if (!selection || selection.rangeCount === 0 || selection.isCollapsed) {
-      return; 
-    }
+  // 1. Aktifkan designMode sementara agar seluruh dokumen bisa dimanipulasi 
+  // layaknya Rich Text Editor (seperti MS Word/Google Docs)
+  document.designMode = 'on';
 
-    // 3. Ambil range (rentang teks) dari seleksi pertama
-    const range = selection.getRangeAt(0);
+  // 2. Eksekusi perintah pewarnaan background pada teks yang terblok.
+  // Browser secara otomatis akan membuat, menimpa, atau memecah tag <span> 
+  // menyesuaikan dengan batas kursor seleksi kamu saat ini.
+  document.execCommand('backColor', false, color); 
 
-    // 4. Buat elemen pembungkus baru
-    const highlightSpan = document.createElement('mark');
-    highlightSpan.style.backgroundColor = color;
-    highlightSpan.style.borderRadius = '4px'; // Opsional, agar sudutnya halus
-    highlightSpan.style.color = 'inherit'; 
+  // 3. Matikan kembali designMode agar halaman kembali normal (read-only)
+  document.designMode = 'off';
 
-    try {
-      // 5. Bungkus teks yang disorot ke dalam elemen baru tadi
-      range.surroundContents(highlightSpan);
-    } catch (error) {
-      // Error biasanya terjadi jika blok teks melewati batas tag HTML lain (misal dari <p> ke <p> lain)
-      console.warn("Seleksi melintasi batas elemen blok yang berbeda.");
-    }
-
-    // 6. Bersihkan seleksi kursor setelah warna diterapkan
-    selection.removeAllRanges();
-  };
+  // 4. Hilangkan blok kursor
+  selection.removeAllRanges();
+};
 
   return (
     <div style={{ padding: '20px', fontFamily: 'sans-serif' }}>
