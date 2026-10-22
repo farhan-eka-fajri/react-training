@@ -9,7 +9,9 @@ function App() {
     <div className="App">
       <header className="App-header">
         {/* <img src={logo} className="App-logo" alt="logo" /> */}
-        <LogoReact style={{animation: 'spin 5s linear infinite', width:'150px'}} />
+        <LogoReact
+          style={{ animation: "spin 5s linear infinite", width: "150px" }}
+        />
         <button
           onClick={() => navigate("/map-google-longitude")}
           style={{
@@ -17,26 +19,40 @@ function App() {
             borderRadius: "15px",
             padding: 20,
             cursor: "pointer",
-            backgroundColor: '#1a73e8',
-            color:'white',
-            fontWeight:700
+            backgroundColor: "#1a73e8",
+            color: "white",
+            fontWeight: 700,
           }}
         >
           CLICK TO MAP
         </button>
-         <button
+        <button
           onClick={() => navigate("/page-logging")}
           style={{
             fontSize: "x-large",
             borderRadius: "15px",
             padding: 20,
             cursor: "pointer",
-            backgroundColor: '#1a73e8',
-            color:'white',
-            fontWeight:700
+            backgroundColor: "#1a73e8",
+            color: "white",
+            fontWeight: 700,
           }}
         >
           CLICK TO TEST PAGE LOGGING
+        </button>
+        <button
+          onClick={() => navigate("/text-highlighter")}
+          style={{
+            fontSize: "x-large",
+            borderRadius: "15px",
+            padding: 20,
+            cursor: "pointer",
+            backgroundColor: "#1a73e8",
+            color: "white",
+            fontWeight: 700,
+          }}
+        >
+          CLICK TO TEST PAGE TEXT HIGLIGHTER
         </button>
         <p>
           Edit <code>src/App.js</code> and save to reload.

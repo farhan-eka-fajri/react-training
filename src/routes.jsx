@@ -2,12 +2,14 @@ import { Route, Routes as OriginalRoutes } from "react-router-dom";
 import App from "./App";
 import MapGoogleLongitude from "./pages/MapGoogleLongitude";
 import PageLogging from "./pages/PageLogging";
+import TextHighlighter from "./pages/TextHiglighter";
 
 function Routes() {
   return (
     <OriginalRoutes>
       <Route path="/" element={<App />} />
       <Route path="/map-google-longitude" element={<MapGoogleLongitude />} />
+      <Route path="/text-highlighter" element={<TextHighlighter />} />
       <Route path="/page-logging" element={<PageLogging />} />
     </OriginalRoutes>
   );
